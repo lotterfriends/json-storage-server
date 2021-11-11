@@ -12,7 +12,6 @@ export class AppController {
 
   @Post()
   sendJson(@Body() json: {}, @Query('filename') filename: string): { filename: string } {
-
     try {
       JSON.parse(JSON.stringify(json));
     } catch (e) {

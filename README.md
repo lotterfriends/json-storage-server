@@ -38,7 +38,6 @@ $ npm run start:docker
 Create .env file with following content
 ```conf
 KEY=123
-WHITELIST=127.0.0.1,::ffff:127.0.0.1
 PORT=6234
 ```
 

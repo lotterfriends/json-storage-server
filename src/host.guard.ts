@@ -11,12 +11,6 @@ export class HostGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
     const key = this.configService.get<string>('KEY');
-    let whitelist = [];
-    const whitelistString = this.configService.get<string>('WHITELIST');
-    const ip: string = request.socket.remoteAddress || null;
-    if (whitelistString?.length) {
-      whitelist = whitelistString.split(',');
-    }
-    return request.headers.key && request.headers.key === key && ip && whitelist.includes(ip);
+    return request.headers.key && request.headers.key === key;
   }
 }
