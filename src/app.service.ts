@@ -1,12 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { randomBytes } from 'crypto';
-import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+
+
+  private getUploadFolderPath(): string {
+    return join(process.cwd(), 'uploads');
   }
 
   private randomString(length: number = 16, readable: boolean, noSpecial: boolean) {
@@ -34,17 +36,33 @@ export class AppService {
     return result;
   }
 
-  upload(json: {}, filename: string): {filename: string} {
-    const uploadsFolder = join(process.cwd(), 'uploads');
+  upload(json: {}, filename: string): { filename: string } {
+    const uploadsFolderPath = this.getUploadFolderPath()
 
-    if (!existsSync(uploadsFolder)) {
-      mkdirSync(uploadsFolder, { recursive: true });
+    if (!existsSync(uploadsFolderPath)) {
+      mkdirSync(uploadsFolderPath, { recursive: true });
     }
 
-    const targetFilename = filename && existsSync(join(uploadsFolder, filename + '.json')) ? filename : this.randomString(24, true, true);
-    writeFileSync(join(uploadsFolder, targetFilename + '.json'), JSON.stringify(json, null, 2));
+    const targetFilename = filename && existsSync(join(uploadsFolderPath, filename + '.json')) ? filename : this.randomString(24, true, true);
+    writeFileSync(join(uploadsFolderPath, targetFilename + '.json'), JSON.stringify(json, null, 2));
     return {
       filename: targetFilename
     }
+  }
+
+  getFile(filename: string): {} {
+    const uploadsFolderPath = this.getUploadFolderPath();
+    const filePath = join(uploadsFolderPath, filename + '.json');
+    if (!existsSync(filePath)) {
+      throw new BadRequestException('invalid filename');
+    }
+
+    const fileContent = readFileSync(filePath, 'utf8');
+    try {
+      return JSON.parse(fileContent);
+    } catch(e) {
+      throw new BadRequestException('invalid json')
+    }
+
   }
 }
