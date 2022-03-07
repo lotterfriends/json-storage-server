@@ -22,7 +22,7 @@ $ npm run start:dev
 $ npm run start:prod
 ```
 
-## Docker Buiild
+## Docker Build
 
 ```bash
 # build app and create docker container
