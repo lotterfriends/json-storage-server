@@ -1,8 +1,7 @@
-import { join } from "path";
+import * as shell from 'shelljs';
 
-const shell = require('shelljs');
 const cwd = process.cwd();
-const pkg = require(join(cwd, 'package.json'));
+const pkg = JSON.parse(shell.cat(cwd, 'package.json'));
 
 shell.exec('npm run build');
 shell.rm('-rf', 'work');
@@ -11,12 +10,19 @@ shell.mkdir('-p', 'work');
 shell.cp('Dockerfile', 'work/Dockerfile');
 shell.exec('ncc build dist/src/main.js -m -o work');
 
-shell.ShellString("Dockerfile").to('work/.dockerignore');
-shell.ShellString(JSON.stringify({
-  version: pkg.version,
-  buildTimestamp: Date.now()
-}, null, 2)).to('work/version.json');
-
+shell.ShellString('Dockerfile').to('work/.dockerignore');
+shell
+  .ShellString(
+    JSON.stringify(
+      {
+        version: pkg.version,
+        buildTimestamp: Date.now(),
+      },
+      null,
+      2,
+    ),
+  )
+  .to('work/version.json');
 
 shell.cd('work');
 

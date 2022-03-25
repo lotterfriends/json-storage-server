@@ -1,17 +1,25 @@
-import { BadRequestException, Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 import { HostGuard } from './host.guard';
 
 @Controller()
 @UseGuards(HostGuard)
 export class AppController {
-  constructor(
-    private readonly appService: AppService,
-  ) { }
-
+  constructor(private readonly appService: AppService) {}
 
   @Post()
-  sendJson(@Body() json: {}, @Query('filename') filename: string): { filename: string } {
+  sendJson(
+    @Body() json: unknown,
+    @Query('filename') filename: string,
+  ): { filename: string } {
     try {
       JSON.parse(JSON.stringify(json));
     } catch (e) {
@@ -23,7 +31,7 @@ export class AppController {
   }
 
   @Get()
-  getJson(@Query('filename') filename: string): {} {
+  getJson(@Query('filename') filename: string): unknown {
     return this.appService.getFile(filename);
   }
 }
